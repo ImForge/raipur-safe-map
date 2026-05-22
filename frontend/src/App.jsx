@@ -82,6 +82,18 @@ export default function App() {
     : 0;
   const safetyScore = Math.max(8, 100 - cityRisk);
 
+  // apply category filter client-side
+  const visibleIncidents = activeCat === 'all'
+    ? incidents
+    : incidents.filter(i => {
+        if (activeCat === 'sexual_assault') return i.type === 'sexual_assault' || i.type === 'assault';
+        return i.type === activeCat;
+      });
+
+  const visibleHotspots = activeCat === 'all'
+    ? hotspots
+    : computeHotspots(visibleIncidents);
+
   return (
     <div className={`root-shell ${timeOfDay === 'night' ? 'is-night' : 'is-day'} ${arming ? 'arming' : ''}`}>
       {/* atmosphere */}
@@ -93,8 +105,8 @@ export default function App() {
 
       {/* map (behind everything) */}
       <MapView
-        incidents={incidents}
-        hotspots={hotspots}
+        incidents={visibleIncidents}
+        hotspots={visibleHotspots}
         arming={arming}
         onMapClick={handleMapClick}
         focusedLatLng={focusedLatLng}
@@ -104,20 +116,21 @@ export default function App() {
       {/* panels */}
       <TopBar
         timeOfDay={timeOfDay}
-        incidents={incidents}
-        hotspots={hotspots}
+        incidents={visibleIncidents}
+        hotspots={visibleHotspots}
         safetyScore={safetyScore}
+        onSearch={(latlng) => setFocusedLatLng(latlng)}
       />
       <LeftSidebar
         timeOfDay={timeOfDay}
-        incidents={incidents}
-        hotspots={hotspots}
+        incidents={visibleIncidents}
+        hotspots={visibleHotspots}
         safetyScore={safetyScore}
         routeShown={routeShown}
         onToggleRoute={() => setRouteShown((r) => !r)}
       />
       <RightSidebar
-        hotspots={hotspots}
+        hotspots={visibleHotspots}
         timeOfDay={timeOfDay}
         onHotspotClick={(h) => setFocusedLatLng({ lat: h.lat, lng: h.lng })}
       />
