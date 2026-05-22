@@ -19,17 +19,21 @@ from models import Base
 
 # create tables on startup if they don't exist
 Base.metadata.create_all(bind=engine)
+
 app = FastAPI(
     title="Raipur Safe Map API",
     description="Backend for Raipur women's safety mapping app.",
     version="0.1.0",
 )
 
-# Allow the React dev server to talk to us during development.
-# In production, restrict allow_origins to your real domain.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "https://raipur-safe-map.vercel.app",      # replace with your actual Vercel URL
+        "https://raipur-safe-map-git-main.vercel.app",  # Vercel also generates this preview URL
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
